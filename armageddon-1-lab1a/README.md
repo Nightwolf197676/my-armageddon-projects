@@ -77,6 +77,7 @@ ______
 - #### ERROR notice!!!
     - note - recursive error when you re-upload this build you will get an error:
     - "You can't create this secret because a secret with this name is already scheduled for deletion." AWS keeps the secret by default for 30 days after you destroy. Therefore run this code to delete now after each terraform destroy
+
 >aws secretsmanager delete-secret --secret-id bos/rds/mysql --force-delete-without-recovery
 
 - #### changes from week 1 files:
@@ -91,7 +92,10 @@ ______
 ### Deliverables
 - go through the [expected lab 1a deliverables](https://github.com/DennistonShaw/armageddon/blob/main/SEIR_Foundations/LAB1/1a_explanation.md). Starting at #4 on the 1a_explanation.md in Theo's armageddon.
 
-#### Architectural Design
+#### Architectural Design 
+
+Theo's outline
+
 - showing the logical flow 
   - A user sends an HTTP request to an EC2 instance
   - The EC2 application:
@@ -104,6 +108,20 @@ ______
   - RDS only allows inbound traffic from the EC2 security group
   - EC2 retrieves credentials dynamically via IAM role
   - No passwords are stored in code or AMIs
+
+My flow query  
+
+ - user -> the internet gateway attached to the VPC to the EC2 inside an AZ us-east-1a inside a Public Subnet, the EC2 has IAM roles attached, also, the EC2 in the public subnet -> SNS inside the Region US East 1 to the email Alert system administered by the SNS outside the Region east 1, also, the EC2 -> to the VPC endpoint -> secrets manager inside region US East 1 but outside of the AZ of us-east-1a, -> RDS inside the Private subnet inside us-east-1a -> Nat Gateway to the internet gateway to the user
+
+Verified conceptual
+
+1. User request is initiated from the internet.
+2. The request passes through the Internet Gateway (IGW) attached to the VPC.
+3. The traffic is routed to the EC2 instance in the public subnet (using its public IP/DNS).
+4. The EC2 instance processes the request, communicates internally with Secrets Manager via a VPC endpoint to retrieve database credentials, and then connects to the RDS instance in the private subnet to query or store data.
+5. The RDS instance sends the data back to the EC2 instance over the private network.
+6. The EC2 instance generates a response and sends it back out through the Internet Gateway (IGW) to the User over the internet.
+7. Separately, if an alert is triggered, the EC2 instance connects to the SNS regional endpoint (either via the IGW or a separate VPC endpoint) to send a notification, which SNS then delivers to the external email system. The NAT gateway is not typically involved in either of these primary request/response paths. 
 
 screen capture (sc)<sup>1</sup>![first draft diagram](./screen-captures/lab1a-diagram.png)
 
@@ -175,35 +193,151 @@ sc<sup>9</sup>![9](./screen-captures/9.png)
 - mysql -h bos-rds01.cmls2wy44n17.us-east-1.rds.amazonaws.com -P 3306 -u admiral -p (you can get this from the command line in vscode in the output section)
 
 ------
+## 6. Technical Verification Using AWS CLI (Mandatory)
+You are expected to prove your work using the CLI — not screenshots alone.
+
+### 6.1 Verify EC2 Instance
+
+>aws ec2 describe-instances --filters "Name=tag:Name,Values=bos-ec201" --query "Reservations[].Instances[].{InstanceId:InstanceId,State:State.Name}"
+
+#### Expected:
+  - Instance ID returned  
+  - Instance state = running
+
+sc<sup>17</sup>![5](./screen-captures/17.png)
 
 
-### 6. Technical Verification Using AWS CLI
+### 6.2 Verify IAM Role Attached to EC2
+>aws ec2 describe-instances \
+  --instance-ids <INSTANCE_ID> \
+  --query "Reservations[].Instances[].IamInstanceProfile.Arn"
+
+#### Expected:
+- ARN of an IAM instance profile (not null)
+
+sc<sup>18</sup>![5](./screen-captures/18.png)
 
 
-- it will then prompt for a password
-  - password is: Broth3rH00d
+### 6.3 Verify RDS Instance State
+>aws rds describe-db-instances \
+  --db-instance-identifier bos-rds01 \
+  --query "DBInstances[].DBInstanceStatus"
 
-sc<sup>11</sup>![11](./screen-captures/11.png)
+#### Expected 
+  Available
 
-- next type (show databases;)
-- next type (use labdb;)
+sc<sup>19</sup>![5](./screen-captures/19.png)
 
-sc<sup>12</sup>![12](./screen-captures/12.png)
+### 6.4 Verify RDS Endpoint (Connectivity Target)
+>aws rds describe-db-instances \
+  --db-instance-identifier bos-rds01 \
+  --query "DBInstances[].Endpoint"
 
-- next (show tables;)
+#### Expected:
+- Endpoint address
+- Port 3306
 
-sc<sup>13</sup>![13](./screen-captures/13.png)
+sc<sup>20</sup>![5](./screen-captures/20.png)
 
-- next (select * from notes)
+### 6.5 (works)
 
-sc<sup>14</sup>![14](./screen-captures/14.png)
+>aws ec2 describe-security-groups --filters "Name=tag:Name,Values=bos-rds-sg01" --query "SecurityGroups[].IpPermissions"
+            
+#### Expected: 
+- TCP port 3306 
+- Source referencing EC2 security group ID, not CIDR
 
-1) Short answers:  
+sc<sup>21</sup>![5](./screen-captures/21.png)
+  
+### 6.6 (run command inside ec2 sessions manager) (works)
+SSH into EC2 and run:
 
-    A. Why is DB inbound source restricted to the EC2 security group?  
-    B. What port does MySQL use?  
-    C. Why is Secrets Manager better than storing creds in code/user-data?
+>>aws secretsmanager get-secret-value --secret-id bos/rds/mysql
+expected result
+                
+                
+#### Expected: 
+- JSON containing: 
+  - username 
+  - password 
+  - host 
+  - port
+        
+
+sc<sup>22</sup>![5](./screen-captures/22.png)
+
+### 6.7 Verify Database Connectivity (From EC2)
+Install MySQL client (temporary validation):
+sudo dnf install -y mysql
+
+#### Connect:
+>>mysql -h <RDS_ENDPOINT> -u admin -p
+
+#### to get the rds endpoint:
+- go to council and connect instance. Code must be run in the AWS terminal (connect > session manager > connect)
+- go to council > rds > databases > DB identifier > connectivity and security - then copy endpoint paste in code. Enter password Broth3rH00d hit return
+
+Expected:
+- Successful login
+- No timeout or connection refused errors
+
+sc<sup>23</sup>![5](./screen-captures/23.png)
+
+### 1. Short answers:  
+
+- A. Why is DB inbound source restricted to the EC2 security group? 
+  - Restricting database inbound traffic to an EC2 security group is a fundamental security best practice
+   
+- B. What port does MySQL use?  
+  - Port 3306
+  
+- C. Why is Secrets Manager better than storing creds in code/user-data?
+  - It centrally stores, encrypts, and manages secrets with automatic rotation and fine-grained access controls, eliminating hardcoded credentials in code/user-data, which significantly reduces the risk of exposure and simplifies lifecycle management. 
+
+-------------
+# meeting #3 - my-armageddon-project-1
+### Group Leader: Omar Fleming
+### Team Leader: Larry Harris
+### Date: 01-06-25 (Tuesday)
+### Time: 8:00pm -  11:15pm est.
+----
+----
+### Members present: 
+- Larry Harris
+- Dennis Shaw
+- Kelly D Moore
+- Bryce Williams
+- Eugene
+- LT (Logan T)
+- NegusKwesi
+- Torray
+- Tre Bradshaw
+- Ted Clayton
+______
 
 
+# Fixes:
 
-notes from
+- inline_policy.json  
+
+<sup>15</sup>![json fix](./screen-captures/15-json-fix.png)
+
+- line 19 create an IAM policy referencing the json from our folder
+- comment out line 26-29 in ec2.tf
+----
+add:
+resource "aws_iam_role_policy" "bos_ec2_secrets_access" {
+  name = "secrets-manager-bos-rds"
+  role = aws_iam_role.bos_ec2_role01.id
+
+  policy = file("${path.module}/00a_inline_policy.json")
+}
+
+<sup>16</sup>![json fix](./screen-captures/16.png)
+
+----
+
+- make sure everyone is caught up
+- go over all deliverables so that everyone can take screenshots
+
+Lab 1a complete!

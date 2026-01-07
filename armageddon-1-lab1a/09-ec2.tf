@@ -23,9 +23,16 @@ resource "aws_iam_role_policy_attachment" "bos_ec2_ssm_attach" {
 }
 
 # Explanation: EC2 must read secrets/params during recovery—give it access (students should scope it down).
-resource "aws_iam_role_policy_attachment" "bos_ec2_secrets_attach" {
-  role       = aws_iam_role.bos_ec2_role01.name
-  policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite" # TODO: student replaces w/ least privilege
+# resource "aws_iam_role_policy_attachment" "bos_ec2_secrets_attach" {
+#   role       = aws_iam_role.bos_ec2_role01.name
+#   policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite" # TODO: student replaces w/ least privilege
+# }
+
+resource "aws_iam_role_policy" "bos_ec2_secrets_access" {
+  name = "secrets-manager-bos-rds"
+  role = aws_iam_role.bos_ec2_role01.id
+
+  policy = file("${path.module}/00a_inline_policy.json")
 }
 
 # Explanation: CloudWatch logs are the “ship’s black box”—you need them when things explode.
