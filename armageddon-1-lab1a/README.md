@@ -78,7 +78,7 @@ ______
     - note - recursive error when you re-upload this build you will get an error:
     - "You can't create this secret because a secret with this name is already scheduled for deletion." AWS keeps the secret by default for 30 days after you destroy. Therefore run this code to delete now after each terraform destroy
 
->aws secretsmanager delete-secret --secret-id bos/rds/mysql --force-delete-without-recovery
+>>aws secretsmanager delete-secret --secret-id bos/rds/mysql --force-delete-without-recovery
 
 - #### changes from week 1 files:
   - variables.tf - line 40 verify the correct AMI #
@@ -180,7 +180,9 @@ sc<sup>6</sup>![6 - add?note=3rd_note](./screen-captures/6-note-3.png)
 - Browser output showing database data
 - Copy and paste this command your vscode terminal 
 
->>>mysql -h bos-rds01.cmls2wy44n17.us-east-1.rds.amazonaws.com -P 3306 -u admiral -p (you can get this from the command line in vscode in the output section)
+>>>mysql -h bos-rds01.cmls2wy44n17.us-east-1.rds.amazonaws.com -P 3306 -u admiral -p 
+
+- (you can get this from the command line in vscode in the output section)
 
 sc<sup>10</sup>![10 - CLI proof and databas data](./screen-captures/10.png)
 
@@ -383,4 +385,4 @@ quick meeting with Larry with some updates for Lab 1b
 
 
 ****** note: will start testing tomorrow, and going through familiarizng myself with the deliverables. 
-- when I see lab in the commands I have to change to bos_ec01
+- when I see "lab" in the commands I have to change to bos_ec01
