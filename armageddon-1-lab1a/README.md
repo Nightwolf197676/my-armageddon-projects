@@ -392,73 +392,84 @@ quick meeting with Larry with some updates for Lab 1b
 - when I see "lab" in the commands I have to change to bos_ec01
 
 -----
-Friday 01-09-25
-5pm - 8pm
-catch up more memebers
+----
+Friday 01-09-25  
+5pm - 8pm  
+caught up more members
+
 ------
-# To check Lab 1a, run the following:
 
-https://github.com/DennistonShaw/armageddon/blob/main/SEIR_Foundations/LAB1/1a_final_check.txt
+------
 
-1) From your workstation (metadata checks; role attach + secret exists)
->>>    chmod +x gate_secrets_and_role.sh
-    REGION=us-east-1 INSTANCE_ID=i-0123456789abcdef0 SECRET_ID=my-db-secret ./gate_secrets_and_role.sh
+# Final Check for lab 1a:
+Saturday 01-10-25
+re:
+- https://github.com/DennistonShaw/armageddon/blob/main/SEIR_Foundations/LAB1/1a_final_check.txt
 
-i-08fcbbd7060b90285
+1) From your local Terminal we are changing permissions for the following files to run (metadata checks; role attach + secret exists)
 
-From inside the EC2 instance (prove the instance role can actually read the secret)
+>>>     chmod +x gate_secrets_and_role.sh
 
->>>    CHECK_SECRET_VALUE_READ=true REGION=us-east-1 INSTANCE_ID=i-0123456789abcdef0 SECRET_ID=my-db-secret ./gate_secrets_and_role.sh
+>>>     chmod +x gate_network_db.sh
 
-Strict mode: require rotation enabled
+>>>     chmod +x run_all_gates.sh
 
- >>>   REQUIRE_ROTATION=true REGION=us-east-1 INSTANCE_ID=i-0123456789abcdef0 SECRET_ID=my-db-secret ./gate_secrets_and_role.sh
+sc<sup>24-1</sup>![24](./screen-captures/24-1.png)
 
+>>>     REGION=us-east-1 INSTANCE_ID=i-0123456789abcdef0 SECRET_ID=my-db-secret ./gate_secrets_and_role.sh
 
-2) Basic: verify RDS isn’t public + SG-to-SG rule exists
+- change_instance ID and Secret_ID and run
+- these are my personal IDs (get yours from the console or terminal)
+  - instance ID: i-0d5a37100e335070c
+  - secrets ID: bos/rds/mysql\
+  - DB_ID: bos-rds01
 
- >>>   chmod +x gate_network_db.sh
-    REGION=us-east-1 INSTANCE_ID=i-0123456789abcdef0 DB_ID=mydb01 ./gate_network_db.sh
+sc<sup>24-2</sup>![24](./screen-captures/24-2.png)
 
+---------
 
+### 1) Basic: verify RDS isn’t public + SG-to-SG rule exists
+
+>>>    REGION=us-east-1 INSTANCE_ID=i-0123456789abcdef0 DB_ID=mydb01 ./gate_network_db.sh
+
+ID Changes:
+  - instance ID: i-0d5a37100e335070c
+  - secrets ID: bos/rds/mysql\
+  - DB_ID: bos-rds01
+
+sc<sup>24-4</sup>![24](./screen-captures/24-4.png)
+
+----
+
+### 2) Basic: verify RDS isn’t public + SG-to-SG rule exists
 Strict: also verify DB subnets are private (no IGW route)
 
->>>CHECK_PRIVATE_SUBNETS=true REGION=us-east-1 INSTANCE_ID=i-0123456789abcdef0 DB_ID=mydb01 ./gate_network_db.sh
-
-If endpoint port discovery fails, override it
-
->>>DB_PORT=5432 REGION=us-east-1 INSTANCE_ID=i-0123456789abcdef0 DB_ID=mydb01 ./gate_network_db.sh
-
-Or.... all in 1
-
->>>chmod +x run_all_gates.sh
-REGION=us-east-1 \
+>>>REGION=us-east-1 \
 INSTANCE_ID=i-0123456789abcdef0 \
 SECRET_ID=my-db-secret \
 DB_ID=mydb01 \
 ./run_all_gates.sh
 
-Strict options (rotation + private subnet check)
+ID Changes:
+  - instance ID: i-0d5a37100e335070c
+  - secrets ID: bos/rds/mysql\
+  - DB_ID: bos-rds01
 
->>>REQUIRE_ROTATION=true \
-CHECK_PRIVATE_SUBNETS=true \
-REGION=us-east-1 INSTANCE_ID=i-... SECRET_ID=... DB_ID=... \
-./run_all_gates.sh
+sc<sup>24-5</sup>![24](./screen-captures/24-5.png)
 
-If running ON the EC2 and you want to assert it can read the secret value
+----
 
->>>CHECK_SECRET_VALUE_READ=true \
-REGION=us-east-1 INSTANCE_ID=i-... SECRET_ID=... DB_ID=... \
-./run_all_gates.sh
+## Strict options (rotation + private subnet check)
 
-
-Expected Output:
+### Expected Output:
 Files created:
-        gate_secrets_and_role.json
-        gate_network_db.json
-        gate_result.json ✅ combined summary
+- gate_secrets_and_role.json
+- gate_network_db.json
+- gate_result.json ✅ combined summary
 
-Exit code:
-        0 = ready to merge / ready to grade
-        2 = fail (exact reasons provided)
-        1 = error (missing env/tools/scripts)
+Exit code: you will see these in the Python (folder) > gate_result.json
+- 0 = ready to merge / ready to grade
+- 2 = fail (exact reasons provided)
+- 1 = error (missing env/tools/scripts)
+
+sc<sup>24-6</sup>![24](./screen-captures/24-6.png)

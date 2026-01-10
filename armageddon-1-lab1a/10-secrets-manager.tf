@@ -42,6 +42,7 @@ resource "aws_ssm_parameter" "bos_db_name_param" {
 # Explanation: Secrets Manager is bos’s locked holster—credentials go here, not in code.
 resource "aws_secretsmanager_secret" "bos_db_secret01" {
   name = "${local.name_prefix}/rds/mysql"
+  recovery_window_in_days = 0
 }
 
 # Explanation: Secret payload—students should align this structure with their app (and support rotation later).
