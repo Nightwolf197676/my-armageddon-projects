@@ -133,10 +133,16 @@ A. Infrastructure Proof
 sc<sup>0</sup>![RDS-SG-inbound](./screen-captures/0.png)
 
   2) RDS MySQL instance in the same VPC
+
+sc<sup>3</sup>![3 - init](./screen-captures/3.png)
+   
   3) Security group rule showing:
-    RDS inbound TCP 3306
-    Source = EC2 security group (not 0.0.0.0/0)
+       - RDS inbound TCP 3306
+      - Source = EC2 security group (not 0.0.0.0/0)  
+  
   IAM role attached to EC2 allowing Secrets Manager access
+
+sc<sup>00</sup>![IAM role attached](./screen-captures/00.png)
 
 Screenshot of: RDS SG inbound rule using source = sg-ec2-lab EC2 role attached 
 
@@ -279,7 +285,7 @@ sc<sup>22</sup>![JSON containing info](./screen-captures/22.png)
 Install MySQL client (temporary validation):
 sudo dnf install -y mysql
 
-#### Connect:
+#### Connect: this next command 6.7 was aready added into the user data therefore no need to run now. See line 4 in user data
 >>>mysql -h <RDS_ENDPOINT> -u admin -p
 
   - to get the rds endpoint:
@@ -353,8 +359,6 @@ resource "aws_iam_role_policy" "bos_ec2_secrets_access" {
 
 # Lab 1a complete!
 
------
-
 # Lab 1b
 01-08-25 
 quick meeting with Larry with some updates for Lab 1b
@@ -386,3 +390,75 @@ quick meeting with Larry with some updates for Lab 1b
 
 ****** note: will start testing tomorrow, and going through familiarizng myself with the deliverables. 
 - when I see "lab" in the commands I have to change to bos_ec01
+
+-----
+Friday 01-09-25
+5pm - 8pm
+catch up more memebers
+------
+# To check Lab 1a, run the following:
+
+https://github.com/DennistonShaw/armageddon/blob/main/SEIR_Foundations/LAB1/1a_final_check.txt
+
+1) From your workstation (metadata checks; role attach + secret exists)
+>>>    chmod +x gate_secrets_and_role.sh
+    REGION=us-east-1 INSTANCE_ID=i-0123456789abcdef0 SECRET_ID=my-db-secret ./gate_secrets_and_role.sh
+
+i-08fcbbd7060b90285
+
+From inside the EC2 instance (prove the instance role can actually read the secret)
+
+>>>    CHECK_SECRET_VALUE_READ=true REGION=us-east-1 INSTANCE_ID=i-0123456789abcdef0 SECRET_ID=my-db-secret ./gate_secrets_and_role.sh
+
+Strict mode: require rotation enabled
+
+ >>>   REQUIRE_ROTATION=true REGION=us-east-1 INSTANCE_ID=i-0123456789abcdef0 SECRET_ID=my-db-secret ./gate_secrets_and_role.sh
+
+
+2) Basic: verify RDS isn’t public + SG-to-SG rule exists
+
+ >>>   chmod +x gate_network_db.sh
+    REGION=us-east-1 INSTANCE_ID=i-0123456789abcdef0 DB_ID=mydb01 ./gate_network_db.sh
+
+
+Strict: also verify DB subnets are private (no IGW route)
+
+>>>CHECK_PRIVATE_SUBNETS=true REGION=us-east-1 INSTANCE_ID=i-0123456789abcdef0 DB_ID=mydb01 ./gate_network_db.sh
+
+If endpoint port discovery fails, override it
+
+>>>DB_PORT=5432 REGION=us-east-1 INSTANCE_ID=i-0123456789abcdef0 DB_ID=mydb01 ./gate_network_db.sh
+
+Or.... all in 1
+
+>>>chmod +x run_all_gates.sh
+REGION=us-east-1 \
+INSTANCE_ID=i-0123456789abcdef0 \
+SECRET_ID=my-db-secret \
+DB_ID=mydb01 \
+./run_all_gates.sh
+
+Strict options (rotation + private subnet check)
+
+>>>REQUIRE_ROTATION=true \
+CHECK_PRIVATE_SUBNETS=true \
+REGION=us-east-1 INSTANCE_ID=i-... SECRET_ID=... DB_ID=... \
+./run_all_gates.sh
+
+If running ON the EC2 and you want to assert it can read the secret value
+
+>>>CHECK_SECRET_VALUE_READ=true \
+REGION=us-east-1 INSTANCE_ID=i-... SECRET_ID=... DB_ID=... \
+./run_all_gates.sh
+
+
+Expected Output:
+Files created:
+        gate_secrets_and_role.json
+        gate_network_db.json
+        gate_result.json ✅ combined summary
+
+Exit code:
+        0 = ready to merge / ready to grade
+        2 = fail (exact reasons provided)
+        1 = error (missing env/tools/scripts)
