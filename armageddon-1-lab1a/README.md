@@ -549,6 +549,8 @@ sc<sup>24-8</sup>![24-8 email fix 2](./screen-captures/24-8-email-fix-2.png)
 - Ted Clayton
 - Jasper
 - Tre Bradshaw
+- Roy Lester
+- Jasper Shivers (Jdollas)
 
 -------------
 
@@ -619,8 +621,8 @@ CloudWatch Alarm → SNS Alarm Concept Trigger when: DB connection errors ≥ 3 
 
 *the original code in Theo's instructions didn't work. We found this new code and replaced it.
 
-aws cloudwatch put-metric-data \
->>>    --namespace bos/RDSApp \
+>>>aws cloudwatch put-metric-data \
+    --namespace bos/RDSApp \
     --metric-name DBConnectionErrors \
     --value 5 \
     --unit Count
@@ -630,9 +632,13 @@ Expected results:
 
 sc<sup>29</sup>![29](./screen-captures/29.png)
 
--you can click the link in the email to view the alrm in the console
+- *note: you can also click the link in the email to view the alarm parameters in more detail in AWS console
 
-sc<sup>30</sup>![30](./screen-captures/30.png)
+sc<sup>30-1</sup>![30-1](./screen-captures/30-1.png)
+
+sc<sup>30-2</sup>![30-2](./screen-captures/30-2-history-data-alarm.png)
+
+sc<sup>30-3</sup>![30-3](./screen-captures/30-3-history-data-ok.png)
 
 ----
 
@@ -663,6 +669,84 @@ Expected: Endpoint + port returned
 sc<sup>32</sup>![32](./screen-captures/32.png)
 
 ----
+
+3.2 Retrieve Secrets Manager Values
+
+>>>aws secretsmanager get-secret-value \
+  --secret-id lab/rds/mysql
+
+Expected: Username/password visible Compare against known-good state
+
+sc<sup>33-1</sup>![33-1](./screen-captures/33-1.png)
+
+------
+
+RUNBOOK SECTION 4 — Containment 4.1 Prevent Further Damage Do not restart EC2 blindly Do not rotate secrets again Do not redeploy infrastructure
+
+Students must explicitly state: “System state preserved for recovery.”
+
+- basically fix the password
+
+sc<sup>33-2</sup>![33-2](./screen-captures/33-2.png)
+
+------
+
+RUNBOOK SECTION 5 — Recovery Recovery Paths (Depends on Root Cause) If Credential Drift Update RDS password to match Secrets Manager OR Update Secrets Manager to known-good value
+
+If Network Block
+- Restore EC2 security group access to RDS on 3306
+
+If DB Stopped
+- Start RDS and wait for available
+
+check url
+
+Verify Recovery 
+>>> curl http://<EC2_PUBLIC_IP>/list
+
+Expected: Application returns data No errors
+
+sc<sup>34</sup>![34](./screen-captures/34.png)
+
+sc<sup>35</sup>![35](./screen-captures/35.png)
+
+-------
+
+RUNBOOK SECTION 6 — Post-Incident Validation 6.1 Confirm Alarm Clears
+
+#### It wouldn't work - group solution
+
+Run this command first, wait 5 minutes (300) after running the code which creates a second alarm to check afer we fix it.
+
+>>>aws cloudwatch put-metric-alarm    --alarm-name bos-db-connection-success    --metric-name DBConnectionErrors    --namespace Bos/RDSApp    --statistic Sum    --period 300    --threshold 3    --comparison-operator GreaterThanOrEqualToThreshold    --evaluation-periods 1 --treat-missing-data notBreaching  --alarm-actions arn:aws:sns:us-east-1:497589205696:bos-db-incidents
+
+run this to verify OK
+
+>>>aws cloudwatch describe-alarms \
+  --alarm-names bos-db-connection-success \
+  --query "MetricAlarms[].StateValue"
+
+sc<sup>36</sup>![36](./screen-captures/36.png)
+
+Expected: OK
+
+------
+
+6.2 Confirm Logs Normalize
+
+>>>aws logs filter-log-events \
+  --log-group-name /aws/ec2/lab-rds-app \
+  --filter-pattern "ERROR"
+
+Expected: No new errors
+
+sc<sup>37</sup>![37](./screen-captures/37.png)
+
+-----
+
+
+----
+
 # meeting #5 - my-armageddon-project-1
 ### Group Leader: Omar Fleming
 ### Team Leader: Larry Harris
@@ -675,8 +759,55 @@ sc<sup>32</sup>![32](./screen-captures/32.png)
 ### Members present: 
 - Larry Harris
 - Dennis Shaw
-- T CEO Lester a.k.a. Roy
-- Tre Bradshaw
+- Kelly D Moore
 - LT (Logan T)
+- Roy Lester
 - Rubeen Perry
 - Ted Clayton
+- Torray
+- Tre Bradshaw
+- David McKenzie
+- Jasper Shivers (Jdollas)
+
+---------
+
+### In today's meeting:
+
+- we went through Theo's instructions for Lab 1b
+
+------------
+
+# Final requirements for Lab 1b
+
+### ALARM: "bos-db-connection-failure" in US East (N. Virginia)
+
+We received this email because Amazon CloudWatch Alarm "bos-db-connection-failure" in the US East (N. Virginia) region has entered the ALARM state; "Threshold Crossed: 1 datapoint [5.0 (11/01/26 18:01:00)] was greater than or equal to the threshold (3.0)." at "Sunday 11 January, 2026 18:06:54 UTC".
+
+### Incident Report: bos-db-connection-failure
+|Field|Description|
+|---|---|
+|Region: |US East (N. Virginia)|
+|AWS Account: | 497589205696|
+|Alarm Arn: | arn:aws:cloudwatch:us-east-1:497589205696:alarm:bos-db-connection-failure|
+|||
+|||
+|STATE CHANGE: | INSUFFICIENT_DATA -> ALARM|
+|Reason for State Change: | *The password was changed resulting in:* Threshold Crossed: datapoint [5.0 (11/01/26)] was greater than or equal to the threshold (3.0).|
+|Date/Time of Incident|Sunday 11, January, 2026 / 18:06:54 UTC: |
+|||
+|||
+|STATE CHANGE: |INSUFFICIENT_DATA -> OK|
+|Reason for State Change: |*Corrected the password.**|
+|Date/Time of Incident |Sunday 11, January, 2026 / 22:03:38 (UTC)|
+
+
+A comprehensive investigation determined that the AWS Secrets Manager password had been modified without authorization. The password has since been restored to its correct value. To prevent a recurrence we will review and refine IAM policies to ensure adherence to the principle of least privilege.
+
+The following actions are recommended:
+- Implement multi-factor authentication (MFA) to provide an additional layer of security, and enable AWS CloudTrail to capture and retain records of all API calls and user activity.
+- Reduce mean time to resolution (MTTR) by deploying Amazon CloudWatch Synthetics canaries to continuously monitor critical endpoints and APIs.
+
+----
+
+
+
