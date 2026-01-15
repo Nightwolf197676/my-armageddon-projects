@@ -923,6 +923,7 @@ Explanation: we had a few problems this past Tuesday with the build and obtainin
 - go to your variables.tf and change your: 
   - email address
   - AWS account number
+  - add .gitignore
 
 sc<sup>46</sup>![46](./screen-captures/46.png)
 
