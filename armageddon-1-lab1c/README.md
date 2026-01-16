@@ -449,16 +449,17 @@ re:
 - https://github.com/DennistonShaw/armageddon/blob/main/SEIR_Foundations/LAB1/1a_final_check.txt
 
 1) From your local Terminal we are changing permissions for the following files to run (metadata checks; role attach + secret exists)
+run the codes in the python folder or point to the folder in the code which I have done:
 
->>>     chmod +x gate_secrets_and_role.sh
+>>>     chmod +x ./python/gate_secrets_and_role.sh
 
->>>     chmod +x gate_network_db.sh
+>>>     chmod +x ./python/gate_network_db.sh
 
->>>     chmod +x run_all_gates.sh
+>>>     chmod +x ./python/run_all_gates.sh
 
 sc<sup>24-1</sup>![24](./screen-captures/24-1.png)
 
->>>     REGION=us-east-1 INSTANCE_ID=i-0123456789abcdef0 SECRET_ID=my-db-secret ./gate_secrets_and_role.sh
+>>>     REGION=us-east-1 INSTANCE_ID=i-04f3d17b7531a486c SECRET_ID=bos/rds/mysql ./python/gate_secrets_and_role.sh
 
 - change_instance ID and Secret_ID and run
 - these are my personal IDs (get yours from the console or terminal)
@@ -480,7 +481,7 @@ ID Changes:
   - secrets ID: bos/rds/mysql
   - DB_ID: bos-rds01
 
-sc<sup>24-4</sup>![24](./screen-captures/24-4.png)
+sc<sup>24-4</sup>![24-4](./screen-captures/24-4.png)
 
 ----
 
@@ -500,7 +501,7 @@ ID Changes:
   - secrets ID: bos/rds/mysql\
   - DB_ID: bos-rds01
 
-sc<sup>24-5</sup>![24](./screen-captures/24-5.png)
+sc<sup>24-5</sup>![24-5](./screen-captures/24-5.png)
 
 ----
 
