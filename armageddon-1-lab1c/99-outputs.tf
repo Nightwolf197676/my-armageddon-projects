@@ -29,7 +29,7 @@ output "bos_log_group_name" {
 
 #Bonus-A outputs (append to outputs.tf)
 
-# Explanation: These outputs prove Chewbacca built private hyperspace lanes (endpoints) instead of public chaos.
+# Explanation: These outputs prove bos built private hyperspace lanes (endpoints) instead of public chaos.
 output "bos_vpce_ssm_id" {
   value = aws_vpc_endpoint.bos_vpce_ssm01.id
 }

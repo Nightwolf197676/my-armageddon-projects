@@ -22,3 +22,4 @@ locals {
   # TODO: Students should lock this down after apply using the real secret ARN from outputs/state
   bos_secret_arn_guess = "arn:aws:secretsmanager:${data.aws_region.bos_region01.region}:${data.aws_caller_identity.bos_self01.account_id}:secret:${local.bos_prefix}/rds/mysql*"
 }
+

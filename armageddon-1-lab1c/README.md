@@ -660,6 +660,8 @@ sc<sup>31</sup>![31](./screen-captures/31.png)
 
 RUNBOOK SECTION 3 — Validate Configuration Sources 3.1 Retrieve Parameter Store Values
 
+change lab to bos in the code
+
 >>>  aws ssm get-parameters \
     --names /lab/db/endpoint /lab/db/port /lab/db/name \
     --with-decryption
@@ -936,3 +938,11 @@ sc<sup>48</sup>![48](./screen-captures/48.png)
 sc<sup>49</sup>![49](./screen-captures/49.png)
 
 Let's get everyone up to date, hopefully before Saturday's meeting. We would like to focus on getting everyone a Domain name (be prepared to spend $3-$15). You will need to obtain a domain to continue with the labs past this point.
+
+https://github.com/DennistonShaw/my-armageddon-projects.git
+
+----
+
+# Lab 1a - Bonus b
+
+
