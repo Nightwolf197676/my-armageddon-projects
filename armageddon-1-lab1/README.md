@@ -923,15 +923,12 @@ sc<sup>45</sup>![45](./screen-captures/45.png)
 
 Explanation: we had a few problems this past Tuesday with the build and obtaining certifications. At this point we need everyone to:
 
-- copy when copying or cloning someone's repository lab
 - clone it to your local
-- create a new folder and copy his files from Lab 1c - Bonus A into your newly created folder
-- copy your README file, any snapshots/screen captures from your old folder, and the inline_policy and paste them into your new folder
+- create a new folder and copy and paste the files from the clone to
+- copy your README file, any snapshots/screen captures, .gitignore and iam-role.tf, and the inline_policiy file from your old folder into your new folder
 - go to your variables.tf and change your: 
   - email address
   - AWS account number
-  - add .gitignore
-  - iam-role.tf and verify the policy path is correct
 
 sc<sup>46</sup>![46](./screen-captures/46.png)
 
@@ -971,14 +968,14 @@ sc<sup>50</sup>![50](./screen-captures/50.png)
 --load-balancer-arn <ALB_ARN>
 --query "Listeners[].Port"
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!need Domain for this
 
 3. Target is healthy
 
 >>>aws elbv2 describe-target-health
 --target-group-arn <TG_ARN>
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!need Domain for this
 sc<sup>51</sup>![51](./screen-captures/51.png)
 
 4. WAF attached
