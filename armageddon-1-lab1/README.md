@@ -1036,7 +1036,7 @@ Class 7 must do:
 * the further you go in the labs, the more work ready you become
 ----
 
-Question and Answer with Theo:
+### Question and Answer with Theo:
 
 Bryce Williams issue: 
 - if the script gives you the answer that you need but not the validation its ok
@@ -1223,5 +1223,32 @@ helpful content: [Analyzing AWS WAF logs: Leveraging CloudWatch Log Insights](ht
 2. **Problem:** We don't want to delet the Route 53 when we terraform destroy  
 **Solution:** 
 
-
 ----
+
+# meeting #8 - my-armageddon-project-1
+### Group Leader: Omar Fleming
+### Team Leader: Larry Harris
+### Date: 01-18-25 (Sunday)
+### Time: 2:00pm - 2:30pm est. in class
+### Time: 2:30pm -  pm est. with group
+
+---------
+
+### Members present: 
+- Larry Harris
+- Dennis Shaw
+- Bryce Williams
+- Kelly D Moore
+- Ted Clayton
+- Logan (LT)
+- David McKenzie
+
+--------
+
+## In Class
+
+
+
+
+-------
+
