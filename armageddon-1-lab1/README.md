@@ -813,7 +813,7 @@ The following actions are recommended:
 
 ----
 
-# meeting #5 - my-armageddon-project-1
+# meeting #6 - my-armageddon-project-1
 ### Group Leader: Omar Fleming
 ### Team Leader: Larry Harris
 ### Date: 01-13-25 (Sunday)
@@ -840,7 +840,7 @@ The following actions are recommended:
 
 -----------
 
-# Student verification (CLI) for Bonus-A
+# [Student verification (CLI) for Bonus-A](https://github.com/DennistonShaw/armageddon/blob/main/SEIR_Foundations/LAB1/1c_bonus-A.txt)
 ----
 ### 1. Prove EC2 is private (no public IP)
 run this code, replace instance ID
@@ -1001,7 +1001,7 @@ sc<sup>54</sup>![54](./screen-captures/54.png)
 ----
 ----
 
-# meeting #5 - my-armageddon-project-1
+# meeting #7 - my-armageddon-project-1
 ### Group Leader: Omar Fleming
 ### Team Leader: Larry Harris
 ### Date: 01-17-25 (Saturday)
@@ -1085,7 +1085,7 @@ sc<sup>62</sup>![58](./screen-captures/62.png)
 ----
 # Beyond this point we need our Domain. The notes are here to execute the deliverables if you have yours. I will continue notes tomorrow after receiving my Domain.
 
-# [# Lab 1c bonus c](https://github.com/DennistonShaw/armageddon/blob/main/SEIR_Foundations/LAB1/1c_bonus-C.md)
+# [Lab 1c bonus c](https://github.com/DennistonShaw/armageddon/blob/main/SEIR_Foundations/LAB1/1c_bonus-C.md)
   
 Student verification (CLI)
 1) Confirm hosted zone exists (if managed)
@@ -1112,7 +1112,7 @@ Expected: HTTP/1.1 200 (or 301 then 200 depending on your app)
 
 ----
 
-# Lab 1c bonus d
+# [Lab 1c bonus d](https://github.com/DennistonShaw/armageddon/blob/main/SEIR_Foundations/LAB1/1c_bonus-D.md)
 
 [Student verification (CLI) — DNS + Logs](https://github.com/DennistonShaw/armageddon/blob/main/SEIR_Foundations/LAB1/1c_bonus-D.md?plain=1)
 
@@ -1161,7 +1161,7 @@ Combined with WAF logs/metrics and ALB 5xx alarms, you can do real triage:
 
 ----
 
-# [# Lab 1c bonus e](https://github.com/DennistonShaw/armageddon/blob/main/SEIR_Foundations/LAB1/1c_bonus-E.md)
+# [Lab 1c bonus e](https://github.com/DennistonShaw/armageddon/blob/main/SEIR_Foundations/LAB1/1c_bonus-E.md)
 
 4) Student verification (CLI)
 ### A) Confirm WAF logging is enabled (authoritative)
@@ -1206,7 +1206,10 @@ Now you can answer questions like:
   “Did WAF mitigate, or are we failing downstream?”
 ----
 
-# [# Lab 1c bonus f](https://github.com/DennistonShaw/armageddon/blob/main/SEIR_Foundations/LAB1/1c_bonus-F.md)
+# [Lab 1c bonus f](https://github.com/DennistonShaw/armageddon/blob/main/SEIR_Foundations/LAB1/1c_bonus-F.md)
+
+helpful content: [Analyzing AWS WAF logs: Leveraging CloudWatch Log Insights](https://aws.amazon.com/ar/video/watch/b117e232382/)
+
 
 #### note: before starting bonus f
 
