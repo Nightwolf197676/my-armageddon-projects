@@ -1076,7 +1076,7 @@ sc<sup>55-4</sup>![55-3](./screen-captures/55-4.png)
 sc<sup>55-4</sup>![55-5](./screen-captures/55-5.png)
 
 ----
-# Beyond this point you need a Domain and certificates to execute the deliverables 
+# Beyond this point you need a Domain and it's certificates to execute the deliverables 
 ----
 
 # meeting #8 - my-armageddon-project-1
