@@ -1077,6 +1077,35 @@ sc<sup>55-4</sup>![55-5](./screen-captures/55-5.png)
 
 ----
 # Beyond this point you need a Domain and certificates to execute the deliverables 
+----
+
+# meeting #8 - my-armageddon-project-1
+### Group Leader: Omar Fleming
+### Team Leader: Larry Harris
+### Date: 01-18-25 (Sunday)
+### Time: 2:00pm - 3:00pm est. in class
+### Time: 3:00pm -  6:30pm est. with group
+
+---------
+
+### Members present: 
+- Larry Harris
+- Dennis Shaw
+- Bryce Williams
+- Kelly D Moore
+- Ted Clayton
+- Logan (LT)
+- David McKenzie
+- Jasper Shivers (Jdollas)
+
+--------
+
+## In Class
+- working mostly individually
+- touble shooting
+- completing bonus f
+
+-------
 
 # [Lab 1c bonus c](https://github.com/DennistonShaw/armageddon/blob/main/SEIR_Foundations/LAB1/1c_bonus-C.md)
   
@@ -1213,37 +1242,6 @@ helpful content: [Analyzing AWS WAF logs: Leveraging CloudWatch Log Insights](ht
 >>>terraform state rm aws_s3_bucket.bos_alb_logs
 
 
-2. **Problem:** We don't want to delet the Route 53 when we terraform destroy  
+2. **Problem:** We don't want to delete the Route 53 when we terraform destroy  
 **Solution:** 
-
-----
-
-# meeting #8 - my-armageddon-project-1
-### Group Leader: Omar Fleming
-### Team Leader: Larry Harris
-### Date: 01-18-25 (Sunday)
-### Time: 2:00pm - 3:00pm est. in class
-### Time: 3:00pm -  pm est. with group
-
----------
-
-### Members present: 
-- Larry Harris
-- Dennis Shaw
-- Bryce Williams
-- Kelly D Moore
-- Ted Clayton
-- Logan (LT)
-- David McKenzie
-- Jasper Shivers (Jdollas)
-
---------
-
-## In Class
-- working mostly individually
-- touble shooting
-- completing bonus f
-
-
--------
 
