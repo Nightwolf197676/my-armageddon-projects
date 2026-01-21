@@ -2,7 +2,7 @@
 # Target Group + Attachment
 ############################################
 
-# Explanation: Target groups are bos’s “who do I forward to?” list — private EC2 lives here.
+# Explanation: Target groups are Chewbacca’s “who do I forward to?” list — private EC2 lives here.
 resource "aws_lb_target_group" "bos_tg01" {
   name     = "${var.project_name}-tg01"
   port     = 80
@@ -13,7 +13,7 @@ resource "aws_lb_target_group" "bos_tg01" {
   health_check {
     enabled             = true
     interval            = 30
-    path                = "/"
+    path                = "/" ### not really sure about this
     port                = "traffic-port"
     protocol            = "HTTP"
     healthy_threshold   = 2
@@ -27,7 +27,7 @@ resource "aws_lb_target_group" "bos_tg01" {
   }
 }
 
-# Explanation: bos personally introduces the ALB to the private EC2 — “this is my friend, don’t shoot.”
+# Explanation: Chewbacca personally introduces the ALB to the private EC2 — “this is my friend, don’t shoot.”
 resource "aws_lb_target_group_attachment" "bos_tg_attach01" {
   target_group_arn = aws_lb_target_group.bos_tg01.arn
   target_id        = aws_instance.bos_ec201_private_bonus.id

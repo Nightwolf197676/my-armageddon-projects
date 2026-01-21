@@ -27,7 +27,7 @@ resource "aws_cloudwatch_metric_alarm" "bos_db_alarm01" {
   statistic           = "Sum"
   threshold           = 3
 
-  alarm_actions       = [aws_sns_topic.bos_sns_topic01.arn]
+  alarm_actions = [aws_sns_topic.bos_sns_topic01.arn]
 
   tags = {
     Name = "${local.name_prefix}-alarm-db-fail"
@@ -65,7 +65,7 @@ resource "aws_cloudwatch_metric_alarm" "bos_alb_5xx_alarm01" {
 # CloudWatch Dashboard (Skeleton)
 ############################################
 
-# Explanation: Dashboards are your cockpit HUD — bos wants dials, not vibes.
+# Explanation: Dashboards are your cockpit HUD — Chewbacca wants dials, not vibes.
 resource "aws_cloudwatch_dashboard" "bos_dashboard01" {
   dashboard_name = "${var.project_name}-dashboard01"
 
@@ -73,15 +73,15 @@ resource "aws_cloudwatch_dashboard" "bos_dashboard01" {
   dashboard_body = jsonencode({
     widgets = [
       {
-        type  = "metric"
-        x     = 0
-        y     = 0
-        width = 12
+        type   = "metric"
+        x      = 0
+        y      = 0
+        width  = 12
         height = 6
         properties = {
           metrics = [
-            [ "AWS/ApplicationELB", "RequestCount", "LoadBalancer", aws_lb.bos_alb01.arn_suffix ],
-            [ ".", "HTTPCode_ELB_5XX_Count", ".", aws_lb.bos_alb01.arn_suffix ]
+            ["AWS/ApplicationELB", "RequestCount", "LoadBalancer", aws_lb.bos_alb01.arn_suffix],
+            [".", "HTTPCode_ELB_5XX_Count", ".", aws_lb.bos_alb01.arn_suffix]
           ]
           period = 300
           stat   = "Sum"
@@ -90,14 +90,14 @@ resource "aws_cloudwatch_dashboard" "bos_dashboard01" {
         }
       },
       {
-        type  = "metric"
-        x     = 12
-        y     = 0
-        width = 12
+        type   = "metric"
+        x      = 12
+        y      = 0
+        width  = 12
         height = 6
         properties = {
           metrics = [
-            [ "AWS/ApplicationELB", "TargetResponseTime", "LoadBalancer", aws_lb.bos_alb01.arn_suffix ]
+            ["AWS/ApplicationELB", "TargetResponseTime", "LoadBalancer", aws_lb.bos_alb01.arn_suffix]
           ]
           period = 300
           stat   = "Average"

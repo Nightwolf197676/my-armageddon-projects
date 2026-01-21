@@ -52,7 +52,4 @@ terraform.rc
 rpm_packages/
 *.zip
 
-.DS_Store
-    **/._.DS_Store
-
 venv/

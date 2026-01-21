@@ -1,7 +1,7 @@
 variable "aws_account_id" {
   description = "id of aws account"
-  type = string
-  default = "497589205696X4"
+  type        = string
+  default     = "497589205696"
 }
 
 variable "aws_region" {
@@ -93,7 +93,7 @@ variable "sns_email_endpoint" {
 variable "domain_name" {
   description = "Base domain students registered (e.g., chewbacca-growl.com)."
   type        = string
-  default     = "a4l-class7.com"
+  default     = "southrakkasmedia.com"
 }
 
 variable "app_subdomain" {
@@ -135,47 +135,53 @@ variable "alb_5xx_evaluation_periods" {
 variable "enable_alb_access_logs" {
   description = "Whether to create the S3 bucket for ALB access logs"
   type        = bool
-  default     = true          # ← choose your preferred default
+  default     = true # ← choose your preferred default
 }
 
-variable "alb_access_logs_prefix" {
-  type    = string
-  default = ""
-
-  validation {
-    condition     = !can(regex("(?i)AWSLogs", var.alb_access_logs_prefix))
-    error_message = "alb_access_logs_prefix must NOT contain 'AWSLogs' (case-insensitive) — AWS adds this automatically."
-  }
-}
-
-variable "waf_log_retention_days" {
-  description = "Number of days to retain WAF CloudWatch log events (0 = never expire)"
-  type        = number
-  default     = 90          # ← common sensible default; change as needed
+variable "manage_route53_in_terraform" {
+  description = "Whether to let Terraform manage creation / updates of the Route 53 hosted zone"
+  type        = bool
+  default     = false # ← most people start with true here ### updated to false
 }
 
 variable "waf_log_destination" {
   description = "Where to send AWS WAFv2 logs: 'cloudwatch', 'firehose', 's3', or 'none'"
   type        = string
-  default     = "none"          # or "cloudwatch" if you want it on by default
+  default     = "cloudwatch" # or "cloudwatch" if you want it on by default
   validation {
     condition     = contains(["cloudwatch", "firehose", "s3", "none"], var.waf_log_destination)
     error_message = "Valid values are: cloudwatch, firehose, s3, none."
   }
 }
 
-variable "manage_route53_in_terraform" {
-  description = "Whether to let Terraform manage creation / updates of the Route 53 hosted zone"
+variable "waf_log_retention_days" {
+  description = "Number of days to retain WAF CloudWatch log events (0 = never expire)"
+  type        = number
+  default     = 90 # ← common sensible default; change as needed
+}
+
+variable "enable_waf_sampled_requests_only" {
+  description = "If true, students can optionally filter/redact fields later. (Placeholder toggle.)"
   type        = bool
-  default     = true   # ← most people start with true here
+  default     = false
 }
 
 variable "route53_hosted_zone_id" {
-  type        = string
-  default     = ""
+  type    = string
+  default = "Z00021892WE8NHJ89CAOJ"
 
   validation {
     condition     = var.route53_hosted_zone_id == "" || can(regex("^[A-Z0-9]{21}$", var.route53_hosted_zone_id))
-    error_message = "route53_hosted_zone_id must be empty or a valid 21-character Route 53 hosted zone ID (e.g. Z0123456789ABCDEF)."
+    error_message = "route53_hosted_zone_id must be empty or a valid 21-character Route 53 hosted zone ID (e.g. Z00021892WE8NHJ89CAOJ)."
+  }
+}
+
+variable "alb_access_logs_prefix" {
+  type    = string
+  default = "alb-access-logs"
+
+  validation {
+    condition     = !can(regex("(?i)AWSLogs", var.alb_access_logs_prefix))
+    error_message = "alb_access_logs_prefix must NOT contain 'AWSLogs' (case-insensitive) — AWS adds this automatically."
   }
 }

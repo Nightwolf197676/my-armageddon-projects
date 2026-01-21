@@ -14,6 +14,21 @@ resource "aws_security_group" "bos_ec2_sg01" {
   }
 }
 
+### EC2 SG Ingress Rule (Bonus B) ###
+resource "aws_vpc_security_group_ingress_rule" "bos_ec2_ingress_from_alb01" {
+  security_group_id            = aws_security_group.bos_ec2_sg01.id
+  referenced_security_group_id = aws_security_group.bos_alb_sg01.id
+  from_port                    = 80
+  to_port                      = 80
+  ip_protocol                  = "tcp"
+}
+
+resource "aws_vpc_security_group_egress_rule" "ec2_all_traffic_ipv4" {
+  security_group_id = aws_security_group.bos_ec2_sg01.id
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1" # semantically equivalent to all ports
+}
+
 # RDS Security Group
 resource "aws_security_group" "bos_rds_sg01" {
   name        = "${local.name_prefix}-rds-sg01"
@@ -25,37 +40,10 @@ resource "aws_security_group" "bos_rds_sg01" {
   }
 }
 
-# EC2 SG Rules
-resource "aws_vpc_security_group_ingress_rule" "bos_ec2_http" {
-  security_group_id = aws_security_group.bos_ec2_sg01.id
-  cidr_ipv4         = "0.0.0.0/0"
-  from_port         = 80
-  ip_protocol       = "tcp"
-  to_port           = 80
-}
-
-data "http" "myip" {
-  url = "https://ipv4.icanhazip.com"
-}
-
-# resource "aws_vpc_security_group_ingress_rule" "bos_ssh" {
-#   security_group_id = aws_security_group.bos_ec2_sg01.id
-#   cidr_ipv4         = "${chomp(data.http.myip.response_body)}/32"
-#   from_port         = 22
-#   ip_protocol       = "tcp"
-#   to_port           = 22
-# }
-
-resource "aws_vpc_security_group_egress_rule" "ec2_all_traffic_ipv4" {
-  security_group_id = aws_security_group.bos_ec2_sg01.id
-  cidr_ipv4         = "0.0.0.0/0"
-  ip_protocol       = "-1" # semantically equivalent to all ports
-}
-
 # RDS SG Rules
 resource "aws_vpc_security_group_ingress_rule" "bos_rds_mysql" {
   security_group_id            = aws_security_group.bos_rds_sg01.id
-  referenced_security_group_id = aws_security_group.bos_ec2_sg01.id 
+  referenced_security_group_id = aws_security_group.bos_ec2_sg01.id
 
   from_port   = 3306
   to_port     = 3306
@@ -92,7 +80,7 @@ resource "aws_security_group" "bos_vpce_sg01" {
 # VPC Interface SG Rules
 resource "aws_vpc_security_group_ingress_rule" "bos_vpce_ingress" {
   security_group_id            = aws_security_group.bos_vpce_sg01.id
-  referenced_security_group_id = aws_security_group.bos_ec2_sg01.id 
+  referenced_security_group_id = aws_security_group.bos_ec2_sg01.id
 
   from_port   = 443
   to_port     = 443
@@ -106,4 +94,46 @@ resource "aws_vpc_security_group_egress_rule" "vpce_all_traffic_ipv4" {
   cidr_ipv4         = "0.0.0.0/0"
   ip_protocol       = "-1" # All protocols and ports
   description       = "Allow all outbound traffic"
+}
+
+### Bonus B
+############################################
+# Security Group: ALB
+############################################
+
+# Explanation: The ALB SG is the blast shield — only allow what the Rebellion needs (80/443).
+resource "aws_security_group" "bos_alb_sg01" {
+  name        = "${var.project_name}-alb-sg01"
+  description = "ALB security group"
+  vpc_id      = aws_vpc.bos_vpc01.id
+
+  # TODO: students add inbound 80/443 from 0.0.0.0/0
+  # TODO: students set outbound to target group port (usually 80) to private targets
+
+  tags = {
+    Name = "${var.project_name}-alb-sg01"
+  }
+}
+
+### Adding the Inbound (80/443) and Outbound Rules for ALB SG (Target Group 80)
+resource "aws_vpc_security_group_ingress_rule" "bos_alb_ingres_80" {
+  security_group_id = aws_security_group.bos_alb_sg01.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 80
+  ip_protocol       = "tcp"
+  to_port           = 80
+}
+
+resource "aws_vpc_security_group_ingress_rule" "bos_alb_ingres_443" {
+  security_group_id = aws_security_group.bos_alb_sg01.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 443
+  ip_protocol       = "tcp"
+  to_port           = 443
+}
+
+resource "aws_vpc_security_group_egress_rule" "bos_alb_egress" {
+  security_group_id = aws_security_group.bos_alb_sg01.id
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1"
 }

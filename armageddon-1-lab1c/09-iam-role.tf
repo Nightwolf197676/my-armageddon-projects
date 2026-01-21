@@ -19,7 +19,7 @@ resource "aws_iam_role_policy" "bos_ec2_secrets_access" {
   name = "secrets-manager-bos-rds"
   role = aws_iam_role.bos_ec2_role01.id
 
-  policy = file("${path.module}/00a_inline_policy.json")
+  policy = file("${path.module}/1a_inline_policy.json")
 }
 
 
