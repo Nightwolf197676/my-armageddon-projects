@@ -1714,7 +1714,8 @@ sc<sup>58-4</sup>![58-4](./screen-captures/58-4.png)
 Q. Why origin-driven caching is safer for APIs?
 When would still disable caching entirely?
 
-A. Origin-driven caching is considered safer for APIs because it ensures the backend (origin) remains the authoritative source of truth for security policies, data validation, cache invalidation, and how long the data is allowed to live. This ensures users receive the latest information rather than stale, outdated, inccorect or unauthorized data.
+A. Origin-driven caching is considered safer for APIs because it ensures the backend (origin) remains the authoritative source of truth for security policies, data validation, cache invalidation, and how long the data is allowed to live. This ensures users receive the latest information rather than stale, outdated, inccorect or unauthorized data. You would disable caching entirely when the data changes frequently or instantly, such as stock prices, live tracking, or real-time sensor data, as serving stale data is unacceptable. Also, sensitive personalized data such as medical records, authentication, authorization, where you don't want data leaks and active development and testing where you need the latest changes immediately.
+
 
 ----
 ----
