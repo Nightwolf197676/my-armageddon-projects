@@ -1881,9 +1881,7 @@ Required student response:
 
 - A: For efficiency to change invalidate only the file that needs to be changed. Doing more is slower, costs more and adds no benefit. It also ensures that users always receive the latest entry point of the application.
 
-!!!!!!!!!!!!!!! I think this is where Theo mentioned having another group participation
-- Verify new content served
-- Write a short incident note (2–5 sentences)
+
 
 ## Part E — “Smart” upgrade (extra credit)
 
@@ -1900,6 +1898,9 @@ AWS Documentation: [Invalidate files to remove content](https://docs.aws.amazon.
   - allowed wildcard usage conditions
   - approval workflow for /*
 
+### Invalidation Budget Policy
+Each team must define a monthly invalidation path budget (default: 200 paths/month) to control cost and reduce cache churn; usage is tracked and reviewed weekly. Wildcard invalidations (/*) are normally prohibited and permitted only for documented emergencies (e.g., security incident, corrupted cache affecting most users, or origin rollback failure). Any /* request requires a short incident note, two-person approval (service owner + platform/lead), and a post-action review explaining root cause and prevention to avoid repeat use.
+
 Student Submission (Honors+)
 
 Students submit:
@@ -1912,6 +1913,9 @@ Students submit:
    - “When do we version instead?”
    - “Why is /* restricted?”
 
+### Cache Invalidation & Versioning Policy
+
+We invalidate CloudFront objects only when a change must be visible immediately at a fixed URL (for example, /static/index.html or a critical config file), and we scope invalidations to the smallest possible path to minimize cost and blast radius. We use versioning (hashed filenames like /static/app.9f3c1c7.js) for all other static assets so updates are picked up automatically without invalidations, enabling long cache TTLs and better performance. The wildcard invalidation /* is restricted because it flushes the entire cache, is expensive, increases origin load, and can cause widespread latency spikes or outages; it should be reserved for rare, emergency scenarios only and require explicit approval.
 
 ----
 
@@ -1935,3 +1939,6 @@ Students submit:
 --------
 
 ## In Class
+- independent work on labs
+
+------
