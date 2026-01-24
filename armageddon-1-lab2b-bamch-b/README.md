@@ -1757,9 +1757,14 @@ Examples:
 Rule 4 — Budget/limits awareness
     First 1,000 invalidation paths/month free, then billed per path; wildcard counts as one path.
 
-### Part A — Add “break glass” invalidation procedure (CLI)
+## Part A — Add “break glass” invalidation procedure (CLI)
 
 **A1) Create an invalidation (single path**
+----
+*note: for windows users you need to use this "MSYS_NO_PATHCONV=1 " at the start of the code for it to recognize the --paths in the preceeding code 
+example:
+- MSYS_NO_PATHCONV=1 aws cloudfront create-invalidation --distribution-id ET8SI4916ZUGG --paths "/static/index.html"
+----
 
 >>>aws cloudfront create-invalidation \
   --distribution-id <DISTRIBUTION_ID> \
@@ -1789,7 +1794,7 @@ sc<sup>59-2</sup>![59-2](./screen-captures/59-2.png)
 
 sc<sup>59-3</sup>![59-3](./screen-captures/59-3.png)
 
-### Part B — “Correctness Proof” checklist (must submit)
+## Part B — “Correctness Proof” checklist (must submit)
 
 **B1) Before invalidation: prove object is cached**
 
@@ -1806,63 +1811,127 @@ Documenatation: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGui
 
 sc<sup>59-4</sup>![59-4](./screen-captures/59-4.png)
 
-!!!!!!!!!!!!!!!!!!!!!!!!check this!!!!!!!!!!!!!!!!!!!
+sc<sup>59-5</sup>![59-5](./screen-captures/59-5.png)
+
 **B2) Deploy change (simulate)**
 Students must update index.html content at origin (or change static file).
 
-sc<sup>59-5</sup>![59-5](./screen-captures/59-5.png)
+- got to the console > ec2 > connect > sessions manager > connect
+- cd /opt/rdsappc
+- ls
+- are you in the right folder?
+- cd static
+- ls
+- if you get a "you don't have permission meesage"
+- type "sudo" first to give administration permission
+- sudo cd /opt/rdsappc
+- touch index.html
 
-B3) After invalidation: prove cache refresh
-Run invalidation for /static/index.html, then:
+sc<sup>59-6</sup>![59-6](./screen-captures/59-6.png)
+
+- now create invalidation
+
+>>>aws cloudfront create-invalidation \
+  --distribution-id <DISTRIBUTION_ID> \
+  --paths "/static/index.html"
+
+Distribution id: EYEZI7L9EMMDQ (Console > CloudFront > Distributions > choose from your distributions)
+
+sc<sup>59-7</sup>![59-7](./screen-captures/59-7.png)
+
+**B3) After invalidation:** 
+- prove cache refresh
+Run invalidation for /static/index.html
+- then run:
 
 >>>curl -i https://southrakkasmedia.com/static/index.html | sed -n '1,30p'
 
 Expected:
-    x-cache is Miss or RefreshHit depending on TTL/conditional validation
-    CloudFront standard logs define Hit, Miss, RefreshHit.
-Documentation: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/standard-logs-reference.html?utm_source=chatgpt.com
+- x-cache is Miss or RefreshHit depending on TTL/conditional validation
+- CloudFront standard logs define Hit, Miss, RefreshHit.
 
-Part C — Terraform “framework” (two options)
-Option 1 (Recommended): Keep invalidations as manual runbook ops
-    Terraform should not constantly invalidate on apply; that trains bad habits.
+Documentation: [Standard logging reference](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/standard-logs-reference.html?utm_source=chatgpt.com)
 
-Option 2 (Advanced/Optional): “Terraform action” invalidation
-    HashiCorp provides a CloudFront invalidation action (not a core resource) that creates invalidations and waits.
+sc<sup>59-8</sup>![59-8](./screen-captures/59-8.png)
 
-Add file: lab2b_honors_plus_invalidation_action.tf
+## Part C — Terraform “framework” (two options)
 
-Part D — Incident Scenario (graded)
-Scenario: “Stale index.html after deployment”
-    Symptoms:
-    users keep receiving old index.html which references old hashed assets
-    static asset caching works, but the HTML entrypoint is stale
+**Option 1 (Recommended):**
+- Keep invalidations as manual runbook ops
+- Terraform should not constantly invalidate on apply; that trains bad habits.
+
+~~**Option 2 (Advanced/Optional): “Terraform action” invalidation**~~
+~~- HashiCorp provides a CloudFront invalidation action (not a core resource) that creates invalidations and waits~~
+~~- Add file: **lab2b_honors_plus_invalidation_action.tf**~~
+
+## Part D — Incident Scenario (graded)
+- Scenario: “Stale index.html after deployment”
+  - Symptoms:
+    - users keep receiving old index.html which references old hashed assets
+    - static asset caching works, but the HTML entrypoint is stale
 
 Required student response:
-    Confirm caching (Age, x-cache)
-    Explain why versioning is preferred but why entrypoint sometimes needs invalidation
-    Invalidate /static/index.html only (not /*)
-    Verify new content served
-    Write a short incident note (2–5 sentences)
+- Confirm caching (Age, x-cache)
+  
+### Q: Explain why versioning is preferred but why entrypoint sometimes needs invalidation
 
-Part E — “Smart” upgrade (extra credit)
-E1) Explain when not to invalidate
-  If the only changed files are versioned assets like:
+- A: Versioning is preferred because it ensures stability, allows for easy rollbacks, and prevents compatibility issues. However, the "entrypoint" (such as an index.html) sometimes needs to be invalidated (forced to refresh) to prevent users from interacting with stale, cached, or broken code. 
 
-    /static/app.9f3c1c7.js
+### Q: Why do we Invalidate /static/index.html only (not /*)?
+
+- A: For efficiency to change invalidate only the file that needs to be changed. Doing more is slower, costs more and adds no benefit. It also ensures that users always receive the latest entry point of the application.
+
+!!!!!!!!!!!!!!! I think this is where Theo mentioned having another group participation
+- Verify new content served
+- Write a short incident note (2–5 sentences)
+
+## Part E — “Smart” upgrade (extra credit)
+
+**E1) Explain when not to invalidate**
+- If the only changed files are versioned assets like:
+  - /static/app.9f3c1c7.js
 then invalidation is unnecessary. AWS recommends versioned names for frequent updates. 
-AWS Documentation: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Invalidation.html?utm_source=chatgpt.com
 
-E2) Create “invalidation budget”
-Students must state:
-    monthly invalidation path budget (e.g., 200)
-    allowed wildcard usage conditions
-    approval workflow for /*
+AWS Documentation: [Invalidate files to remove content](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Invalidation.html?utm_source=chatgpt.com)
+
+**E2) Create “invalidation budget”**
+- Students must state:
+  - monthly invalidation path budget (e.g., 200)
+  - allowed wildcard usage conditions
+  - approval workflow for /*
 
 Student Submission (Honors+)
+
 Students submit:
-    1) CLI command used (create-invalidation) + invalidation ID  Documentation: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/example_cloudfront_CreateInvalidation_section.html?utm_source=chatgpt.com
-    2) Proof of cache before + after (headers showing Age/x-cache) Documentation: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/standard-logs-reference.html?utm_source=chatgpt.com
-    3) A 1-paragraph policy:
-        “When do we invalidate?”
-        “When do we version instead?”
-        “Why is /* restricted?”
+1) CLI command used (create-invalidation) + invalidation ID  Documentation: 
+   - [Use CreateInvalidation with a CLI](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/example_cloudfront_CreateInvalidation_section.html?utm_source=chatgpt.com)
+2) Proof of cache before + after (headers showing Age/x-cache) Documentation: 
+   - [Standard logging reference](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/standard-logs-reference.html?utm_source=chatgpt.com)
+3) A 1-paragraph policy:
+   - “When do we invalidate?”
+   - “When do we version instead?”
+   - “Why is /* restricted?”
+
+
+----
+
+# meeting #9 - my-armageddon-project-1
+### Group Leader: Omar Fleming
+### Team Leader: Larry Harris
+### Date: 01-24-25 (Sunday)
+### Time: 2:00pm - 3:00pm est. in class
+### Time: 3:00pm -  pm est. with group
+
+---------
+
+### Members present: 
+- Larry Harris
+- Dennis Shaw
+- LT (Logan T)
+- Omar Ali
+- Tre Bradshaw
+- David McKenzie
+
+--------
+
+## In Class
